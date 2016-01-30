@@ -12,6 +12,7 @@ class TicTacToe
     private:
         void runWithAi(int boardSize);
         void runWithoutAi(int boardSize);
+        void getRandomAiMove(int& x, int& y, GameBoard& board);
         const int getWinner(GameBoard& board);        
 
         char m_playerOne;

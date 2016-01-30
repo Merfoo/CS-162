@@ -1,4 +1,6 @@
 #include "Util.h"
+#include <cstdlib>
+#include <time.h>
 
 const bool isDigit(char n)
 {
@@ -10,4 +12,14 @@ const bool isDigit(char n)
 const int toInt(char n)
 {
     return int(n) - 48;
+}
+
+void initRandomInt()
+{
+    srand(time(0));   
+}
+
+const int getRandomInt(int min, int max)
+{
+    return (rand() % (max - min + 1)) + min; 
 }

@@ -21,8 +21,8 @@ void TicTacToe::play()
     while(true)
     {
         string resp = " ";
-
-        cout << "Board size (must be between 2 and 5, inclusive): ";
+        
+        cout << endl <<  "Board size (must be between 2 and 5, inclusive): ";
         getline(cin, resp);
 
         if(isDigit(resp[0]))
@@ -90,7 +90,88 @@ void TicTacToe::runWithAi(int boardSize)
         }
 
         cout << "Invalid input!" << endl;
-    }   
+    }
+    
+    GameBoard board(boardSize);
+    bool aiTurn = aiFirst;
+    char currPlayer = aiFirst ? m_playerTwo : m_playerOne;
+
+    for(int i = 0; i < boardSize; i++)
+        for(int j = 0; j < boardSize; j++)
+            board.set(i, j, m_emptySpace);
+
+    while(true)
+    {
+        char userX = ' ';
+        char userY = ' ';
+        
+        while(true)
+        {
+            if(aiTurn)
+            {
+                int x = 0;
+                int y = 0;
+
+                getRandomAiMove(x, y, board);
+                board.set(x, y, aiFirst ? m_playerOne : m_playerTwo);
+                aiTurn = false;
+                break;
+            }
+
+            else
+            {
+                board.print();
+                cout << "Player " << (aiFirst ? 2 : 1) << " (";
+                cout << currPlayer << ") turn" << endl;
+                cout << "Enter coordinates 'x y'" << endl;
+        
+                cin >> userX >> userY;
+                cout << endl << endl << endl;
+
+                if(isDigit(userX) && isDigit(userY))
+                {
+                    int x = toInt(userX);
+                    int y = toInt(userY);
+
+                    if(x >= 0 && x < boardSize && y >= 0 && y < boardSize)
+                    {
+                        if(board.get(x, y) == m_emptySpace)
+                        {
+                            board.set(x, y, currPlayer);
+                            aiTurn = true;
+                            break;
+                        }
+
+                        else
+                            cout << "Spot already taken!" << endl;
+                    }      
+                
+                    else
+                        cout << "Invalid coordinates!" << endl;  
+                }
+
+                else
+                    cout << "Invalid coordinates!" << endl;
+            }
+        }
+
+        int winner = getWinner(board);
+
+        if(winner > -1)
+        {
+            cout << endl;
+            board.print();
+
+            if(winner == 0)
+                cout << "Cats game!" << endl;
+
+            else
+                cout << "Player " << winner << " won!" << endl;
+
+            cout << endl;
+            break;
+        }
+    }
 }
 
 void TicTacToe::runWithoutAi(int boardSize)
@@ -115,7 +196,7 @@ void TicTacToe::runWithoutAi(int boardSize)
 
             cout << "Player " << (playerOneTurn ? 1 : 2) << " (";
             cout << currPlayer << ") turn" << endl;
-            cout << "Enter coordinates 'x, y'" << endl;
+            cout << "Enter coordinates 'x y'" << endl;
         
             cin >> userX >> userY;
             cout << endl << endl << endl;
@@ -163,6 +244,16 @@ void TicTacToe::runWithoutAi(int boardSize)
             break;
         }
     }
+}
+
+void TicTacToe::getRandomAiMove(int& x, int& y, GameBoard& board)
+{
+    do
+    {
+        x = getRandomInt(0, board.getSize() - 1);
+        y = getRandomInt(0, board.getSize() - 1);
+    }
+    while(board.get(x, y) != m_emptySpace);
 }
 
 const int TicTacToe::getWinner(GameBoard& board)
