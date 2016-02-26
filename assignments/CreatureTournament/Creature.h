@@ -13,6 +13,8 @@ public:
 	Creature();
 	virtual ~Creature() = 0;
 
+	virtual void restore() = 0;
+
 	virtual void attack(Creature* victim);
 	virtual int defend(int attackValue);
 
@@ -30,9 +32,13 @@ public:
 	void setName(std::string name);
 	std::string getName();
 
+	void setPoints(int points);
+	int getPoints();
+
 	void print();
 
 protected:
+	int m_points;
 	int m_strength;
 	int m_armor;
 	std::vector<Dice> m_defDices;

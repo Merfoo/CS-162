@@ -1,24 +1,28 @@
 #include "Unicorn.h"
 
-Unicorn::Unicorn()
+Unicorn::Unicorn(std::string name)
 {
 	m_strength = 18;
 	m_armor = 3;
-
 	m_defDices.push_back(Dice(6));
 	m_defDices.push_back(Dice(6));
-
 	m_atkDices.push_back(Dice(20));
 	m_atkDices.push_back(Dice(6));
 	m_atkDices.push_back(Dice(6));
-
 	m_type = Creature::Type::UNICORN;
-
 	m_atkMode = false;
+	m_name = name;
 }
 
 Unicorn::~Unicorn()
 {
+}
+
+void Unicorn::restore()
+{
+	m_strength = 18;
+	m_armor = 3;
+	m_atkMode = false;
 }
 
 void Unicorn::attack(Creature* victim)

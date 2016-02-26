@@ -1,12 +1,15 @@
 #pragma once
 
+#include <iostream>
 #include "Creature.h"
 
 class Unicorn : public Creature
 {
 public:
-	Unicorn();
+	Unicorn(std::string name);
 	~Unicorn();
+
+	virtual void restore();
 
 	virtual void attack(Creature* victim);
 	virtual int defend(int attack);

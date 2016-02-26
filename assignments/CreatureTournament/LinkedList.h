@@ -9,21 +9,25 @@ private:
     struct Node
     {
         Creature* creature;
-        Node* next;  
+		Node* prev;
+        Node* next;
     };
 
     Node* m_head;
     Node* m_tail;
 
+	int m_size;
+
 public:
     LinkedList();
     ~LinkedList();
 
-	// TODO: Implement copy constructor assignment overrider
-	LinkedList(const LinkedList& newList);
-	LinkedList& operator=(const LinkedList& rhs);
+	int size();
+	// WARNING: There is no copy constructor or assignment operator
 
     void pushBack(Creature* creature);
+	void pushFront(Creature* creature);
+	Creature* popBack();
     Creature* popFront();
 	void clearAllNodes();
     void print();

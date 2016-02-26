@@ -2,6 +2,7 @@
 
 Creature::Creature()
 {
+	m_points = 0;
 	m_name = "";
 }
 
@@ -34,7 +35,7 @@ int Creature::getAttackValue()
 	for (int i = 0; i < m_atkDices.size(); i++)
 		atk += m_atkDices.at(i).get();
 
-	std::cout << "Atk: " << atk << std::endl;
+	//std::cout << "Atk: " << atk << std::endl;
 	return atk;
 }
 
@@ -45,7 +46,7 @@ int Creature::getDefenseValue()
 	for (int i = 0; i < m_defDices.size(); i++)
 		def += m_defDices.at(i).get();
 
-	std::cout << "Def: " << def << std::endl;
+	//std::cout << "Def: " << def << std::endl;
 	return def;
 }
 
@@ -97,6 +98,16 @@ void Creature::setName(std::string name)
 std::string Creature::getName()
 {
 	return m_name;
+}
+
+void Creature::setPoints(int points)
+{
+	m_points = points;
+}
+
+int Creature::getPoints()
+{
+	return m_points;
 }
 
 void Creature::print()

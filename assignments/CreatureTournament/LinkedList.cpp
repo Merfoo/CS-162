@@ -3,9 +3,12 @@
 LinkedList::LinkedList()
 {
     m_head = new Node;
+	m_head->prev = 0;
     m_head->next = 0;
     
     m_tail = m_head;
+	
+	m_size = 0;
 }
 
 LinkedList::~LinkedList()
@@ -14,53 +17,72 @@ LinkedList::~LinkedList()
 	delete m_head;
 }
 
-// TODO: This doesn't deep copy, MAKE IT DEEP COPY
-LinkedList::LinkedList(const LinkedList& newList)
+int LinkedList::size()
 {
-	m_head = new Node;
-	m_head->next = 0;
-
-	m_tail = m_head;
-	Node* node = newList.m_head->next;
-
-	while (node != 0)
-	{
-		pushBack(node->creature);
-		node = node->next;
-	}
-}
-
-LinkedList& LinkedList::operator=(const LinkedList& rhs)
-{
-	clearAllNodes();
-	Node* node = rhs.m_head->next;
-
-	while (node != 0)
-	{
-		pushBack(node->creature);
-		node = node->next;
-	}
-
-	return *this;
+	return m_size;
 }
 
 void LinkedList::pushBack(Creature* creature)
 {
     Node* node = new Node;
     node->creature = creature;
+	node->prev = m_tail;
     node->next = 0;
 
     m_tail->next = node;
     m_tail = node;
+
+	m_size++;
+}
+
+void LinkedList::pushFront(Creature* creature)
+{
+	Node* node = new Node;
+	node->creature = creature;
+	node->prev = m_head;
+	node->next = m_head->next;
+
+	m_head->next->prev = node;
+	m_head->next = node;
+
+	if (m_size == 0)
+		m_tail = node;
+
+	m_size++;
+}
+
+Creature* LinkedList::popBack()
+{
+	if (m_size <= 0)
+		return 0;
+
+	Node* node = m_tail;
+	Creature* creature = node->creature;
+	node->prev->next = 0;
+	
+	m_tail = node->prev;
+	delete node;
+
+	m_size--;
 }
 
 Creature* LinkedList::popFront()
 {
+	if (m_size <= 0)
+		return 0;
+
     Node* node = m_head->next;
     Creature* creature = node->creature;
 
+	if(node->next != 0)
+		node->next->prev = m_head;
+
     m_head->next = node->next;
     delete node;
+	m_size--;
+
+	if (m_size == 0)
+		m_tail = m_head;
 
     return creature;
 }
@@ -81,6 +103,7 @@ void LinkedList::clearAllNodes()
 
 	m_head->next = 0;
 	m_tail = m_head;
+	m_size = 0;
 }
 
 void LinkedList::print()
@@ -92,6 +115,4 @@ void LinkedList::print()
 		node->creature->print();
         node = node->next;       
     }
-
-    delete node;
 }

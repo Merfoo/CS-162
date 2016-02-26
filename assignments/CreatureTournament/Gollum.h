@@ -9,10 +9,13 @@
 class Gollum : public Creature
 {
 public:
-	Gollum();
+	Gollum(std::string name);
 	~Gollum();
 
+	virtual void restore();
+
 	virtual int getAttackValue();
+
 private:
 	std::vector<Dice> m_specialAtk;
 };

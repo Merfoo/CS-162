@@ -1,95 +1,138 @@
+#include <iostream>
+#include <string>
 #include "Game.h"
 #include "Util.h"
+#include "Gollum.h"
+#include "Barbarian.h"
+#include "BabaYaga.h"
+#include "BlueMen.h"
+#include "Unicorn.h"
 
 Game::Game()
 {
-	m_creatures.push_back(new Gollum);
-	m_creatures.push_back(new Barbarian);
-	m_creatures.push_back(new BabaYaga);
-	m_creatures.push_back(new BlueMen);
-	m_creatures.push_back(new Unicorn);
 }
 
 Game::~Game()
 {
-	for (int i = 0; i < m_creatures.size(); i++)
-		delete m_creatures.at(i);
+}
+
+void Game::getTeam(LinkedList& team, std::string teamName)
+{
+	std::cout << "Number of fighters: ";
+	int numberOfFighters = getInt();
+
+	for (int i = 0; i < numberOfFighters; i++)
+	{
+		int type = 0;
+		
+		while (true)
+		{
+			std::string input;
+
+			std::cout << "[1] Gollum" << std::endl;
+			std::cout << "[2] Barbarian" << std::endl;
+			std::cout << "[3] Baba Yaga" << std::endl;
+			std::cout << "[4] Blue Men" << std::endl;
+			std::cout << "[5] Unicorn" << std::endl;
+
+			std::cout << "Fighter type: ";
+			type = getInt();
+
+			if (type > 0 && type < 6)
+				break;
+
+			std::cout << "Invalid fighter type!" << std::endl;
+		}
+
+		std::string name;
+		std::cout << "Name of fighter: ";
+		getline(std::cin, name);
+		name = teamName + ": " + name;
+
+		if (type == 1)
+			team.pushBack(new Gollum(name));
+
+		else if (type == 2)
+			team.pushBack(new Barbarian(name));
+
+		else if (type == 3)
+			team.pushBack(new BabaYaga(name));
+
+		else if (type == 4)
+			team.pushBack(new BlueMen(name));
+
+		else if (type == 5)
+			team.pushBack(new Unicorn(name));
+	}
 }
 
 void Game::play()
 {
+	LinkedList teamA;
+	LinkedList teamB;
+	LinkedList losers;
 
-	LinkedList list;
-	list.pushBack(new Gollum);
-	list.pushBack(new Barbarian);
-	list.pushBack(new BabaYaga);
-	list.pushBack(new BlueMen);
-	list.pushBack(new Unicorn);
+	std::cout << "Lineup for Team A" << std::endl;
+	getTeam(teamA, "Team A");
 
-	list.print();
-	return;
+	std::cout << "Lineup for Team B" << std::endl;
+	getTeam(teamB, "Team B");
 
-	Creature* a = 0;
-	Creature* b = 0;
-	int indexA = 0;
-	int indexB = 0;
+	std::cout << std::endl;
 
-	while (true)
+	while (teamA.size() > 0 && teamB.size() > 0)
 	{
-		bool aUni = a != 0 ? a->getType() == Creature::Type::UNICORN : false;
-		bool bUni = b != 0 ? b->getType() == Creature::Type::UNICORN : false;
+		Creature* a = teamA.popFront();
+		Creature* b = teamB.popFront();
+		Creature* winner;
 
-		if (!(aUni && bUni))
+		while (true)
 		{
-			indexA = getRandomInt(0, m_creatures.size());
-			indexB = 0;
+			// A won
+			if (attack(a, b))
+			{
+				winner = a;
+				teamA.pushBack(a);
+				losers.pushBack(b);
+				break;
+			}
 
-			while ((indexB = getRandomInt(0, m_creatures.size())) == indexA);
-
-			a = m_creatures.at(indexA);
-			b = m_creatures.at(indexB);
+			// B won
+			else if (attack(b, a))
+			{
+				winner = b;
+				teamB.pushBack(b);
+				losers.pushBack(a);
+				break;
+			}
 		}
 
-		std::cout << "NEW BATTLE" << std::endl;
-
-		if (attack(a, b))
-		{
-			delete b;
-			b = 0;
-			m_creatures.erase(m_creatures.begin() + indexB);
-		}
-
-		else if (attack(b, a))
-		{
-			delete a;
-			a = 0;
-			m_creatures.erase(m_creatures.begin() + indexA);
-		}
-
-		if (m_creatures.size() == 1)
-			break;
+		std::cout << "Fighter " << winner->getName() << " won!" << std::endl;
+		winner->print();
+		int currStr = winner->getStrength();
+		winner->restore();
+		winner->setPoints(winner->getPoints() + (winner->getStrength() - currStr));
 	}
 
-	std::cout << "The winner is: " << m_creatures.at(0)->getReadableType()
-		<< "!" << std::endl;
+	LinkedList winners;
 }
 
 bool Game::attack(Creature* attacker, Creature* defender)
 {
-	std::cout << "Before attack:" << std::endl;
+	/*std::cout << "Before attack:" << std::endl;
 	std::cout << "Attacker" << std::endl;
 	attacker->print();
 	std::cout << "Defender" << std::endl;
-	defender->print();
+	defender->print();*/
 
 	attacker->attack(defender);
 
-	std::cout << "After attack:" << std::endl;
+	/*std::cout << "After attack:" << std::endl;
 	std::cout << "Attacker" << std::endl;
 	attacker->print();
 	std::cout << "Defender" << std::endl;
 	defender->print();
-	std::cout << std::endl;
+	std::cout << std::endl;*/
 
 	if (defender->getStrength() <= 0)
 		return true;
