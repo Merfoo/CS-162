@@ -42,7 +42,9 @@ void LinkedList::pushFront(Creature* creature)
 	node->prev = m_head;
 	node->next = m_head->next;
 
-	m_head->next->prev = node;
+	if(m_head->next != 0)
+		m_head->next->prev = node;
+
 	m_head->next = node;
 
 	if (m_size == 0)
@@ -64,6 +66,8 @@ Creature* LinkedList::popBack()
 	delete node;
 
 	m_size--;
+
+	return creature;
 }
 
 Creature* LinkedList::popFront()
