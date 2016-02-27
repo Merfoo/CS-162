@@ -15,6 +15,7 @@ private:
 
     Node* m_head;
     Node* m_tail;
+	Node* m_next;
 
 	int m_size;
 
@@ -29,6 +30,9 @@ public:
 	void pushFront(Creature* creature);
 	Creature* popBack();
     Creature* popFront();
+	Creature* pop(int index);
+	Creature* getNext();
+	void resetNext();
 	void clearAllNodes();
     void print();
 };

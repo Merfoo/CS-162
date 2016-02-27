@@ -14,4 +14,5 @@ public:
 private:
 	bool attack(Creature* attacker, Creature* defender);
 	void getTeam(LinkedList& team, std::string teamName);
+	void getLowestPoints(LinkedList& src, LinkedList& dest);
 };

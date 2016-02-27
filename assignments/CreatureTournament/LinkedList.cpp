@@ -7,7 +7,9 @@ LinkedList::LinkedList()
     m_head->next = 0;
     
     m_tail = m_head;
-	
+
+	m_next = m_head->next;
+
 	m_size = 0;
 }
 
@@ -89,6 +91,53 @@ Creature* LinkedList::popFront()
 		m_tail = m_head;
 
     return creature;
+}
+
+Creature* LinkedList::pop(int index)
+{
+	if (index >= 0 && index < m_size)
+	{
+		Node* node = m_head;
+		int i = -1;
+
+		while (i < index)
+		{
+			node = node->next;
+			i++;
+		}
+
+		Creature* creature = node->creature;
+
+		node->prev->next = node->next;
+
+		if (node->next != 0)
+			node->next->prev = node->prev;
+
+		delete node;
+		m_size--;
+
+		return creature;
+	}
+
+	return 0;
+}
+
+Creature* LinkedList::getNext()
+{
+	if (m_next != 0)
+	{
+		Creature* creature = m_next->creature;
+		m_next = m_next->next;
+
+		return creature;
+	}
+
+	return 0;
+}
+
+void LinkedList::resetNext()
+{
+	m_next = m_head->next;
 }
 
 void LinkedList::clearAllNodes()

@@ -66,6 +66,30 @@ void Game::getTeam(LinkedList& team, std::string teamName)
 	}
 }
 
+void Game::getLowestPoints(LinkedList& src, LinkedList& dest)
+{
+	for (int i = 0; i < 3 && src.size() > 0; i++)
+	{
+		src.resetNext();
+
+		int smallest = src.getNext()->getPoints();
+		int index = 0;
+
+		for (int j = 1; j < src.size(); j++)
+		{
+			int currPoints = src.getNext()->getPoints();
+
+			if (currPoints < smallest)
+			{
+				smallest = currPoints;
+				index = j;
+			}
+		}
+
+		dest.pushBack(src.pop(index));
+	}
+}
+
 void Game::play()
 {
 	LinkedList teamA;
@@ -86,6 +110,11 @@ void Game::play()
 		Creature* b = teamB.popFront();
 		Creature* winner;
 
+		std::cout << a->getName();
+		std::cout << " vs ";
+		std::cout << b->getName();
+		std::cout << std::endl;
+
 		while (true)
 		{
 			// A won
@@ -93,7 +122,8 @@ void Game::play()
 			{
 				winner = a;
 				teamA.pushBack(a);
-				losers.pushBack(b);
+				b->setPoints(0);
+				losers.pushFront(b);
 				break;
 			}
 
@@ -102,19 +132,71 @@ void Game::play()
 			{
 				winner = b;
 				teamB.pushBack(b);
-				losers.pushBack(a);
+				a->setPoints(0);
+				losers.pushFront(a);
 				break;
 			}
 		}
 
 		std::cout << "Fighter " << winner->getName() << " won!" << std::endl;
-		winner->print();
+		std::cout << "\tType: " << winner->getReadableType() << std::endl;
 		int currStr = winner->getStrength();
 		winner->restore();
 		winner->setPoints(winner->getPoints() + (winner->getStrength() - currStr));
+		std::cout << std::endl;
 	}
 
+	std::string winningTeam = (teamA.size() > 0 ? "A" : "B");
 	LinkedList winners;
+	teamA.size() > 0 ? getLowestPoints(teamA, winners) : getLowestPoints(teamB, winners);
+	
+	if (winners.size() < 3)
+		while (winners.size() < 3 && losers.size() > 0)
+			winners.pushBack(losers.popFront());
+	
+	std::cout << "Team " << winningTeam << " scored the most points!" << std::endl;
+	std::cout << "WINNERS" << std::endl;
+
+	winners.resetNext();
+
+	for (int i = 0; i < winners.size(); i++)
+	{
+		std::cout << (i + 1) << ")" << std::endl;
+		Creature* creature = winners.getNext();
+		std::cout << "\tType: " << creature->getReadableType() << std::endl;
+		std::cout << "\tName: " << creature->getName() << std::endl;
+		std::cout << "\tPoints: " << creature->getPoints() << std::endl;
+	}
+
+	std::cout << "Display losers? [y] [n]" << std::endl;
+	std::string input;
+
+	while (true)
+	{
+		getline(std::cin, input);
+
+		if (input != "y" && input != "n")
+			std::cout << "Invalid input!" << std::endl;
+
+		else
+			break;
+	}
+
+	if (input == "y")
+	{
+		std::cout << "LOSERS" << std::endl;
+		int place = winners.size();
+
+		while (losers.size() > 0)
+		{
+			Creature* creature = losers.popFront();
+			std::cout << (++place) << ")" << std::endl;
+			std::cout << "\tType: " << creature->getReadableType() << std::endl;
+			std::cout << "\tName: " << creature->getName() << std::endl;
+			std::cout << "\tPoints: " << creature->getPoints() << std::endl;
+			delete creature;
+		}
+	}
 }
 
 bool Game::attack(Creature* attacker, Creature* defender)
