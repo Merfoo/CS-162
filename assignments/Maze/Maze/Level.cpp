@@ -1,21 +1,26 @@
 #include "Level.h"
 #include <string>
+#include "Actor.h"
 
 using namespace std;
 
 Level::Level()
 {
+	m_board = 0;
 }
 
 Level::~Level()
 {
-	for (int i = 0; i < m_boardWidth; i++)
-		delete[] m_board[i];
+	if (m_board != 0)
+	{
+		for (int i = 0; i < m_boardWidth; i++)
+			delete[] m_board[i];
 
-	delete[] m_board;
+		delete[] m_board;
+	}
 }
 
-bool Level::create(std::string filename)
+bool Level::create(std::string filename, bool isLastLevel)
 {
 	cout << "Creating level from file '" << filename << "'" << endl;
 	ifstream file(filename);
@@ -32,7 +37,7 @@ bool Level::create(std::string filename)
 		return false;
 	}
 
-	if (!setBoardData(file))
+	if (!setBoardData(file, isLastLevel))
 	{
 		cout << "Invalid board data!" << endl;
 		return false;
@@ -40,20 +45,34 @@ bool Level::create(std::string filename)
 
 	cout << "Level from file '" << filename << "' created successfuly" << endl;
 	file.close();
+	return true;
 }
 
-void Level::print()
+void Level::print(Actor** actors, int actorLength)
 {
 	for (int y = 0; y < m_boardHeight; y++)
 	{
 		for (int x = 0; x < m_boardWidth; x++)
-			cout << m_board[x][y];
+		{
+			char c = m_board[x][y];
+
+			for (int i = 0; i < actorLength; i++)
+			{
+				if (actors[i]->getX() == x && actors[i]->getY() == y)
+				{
+					c = actors[i]->getSymbol();
+					break;
+				}
+			}
+
+			cout << c;
+		}
 
 		cout << endl;
 	}
 }
 
-bool Level::isValidChar(char c)
+bool Level::isValidSymbol(char c)
 {
 	/* '
 		Valid characters
@@ -69,10 +88,10 @@ bool Level::isValidChar(char c)
 		‘ ‘ - empty space(blank character)
 	*/
 
-	char validChars[] = { '#', 'D', 'L', 'P', 'S', 'K', 'A', 'E', 'X', ' ' };
+	char validSymbols[] = { '#', 'D', 'L', 'P', 'S', 'K', 'A', 'E', 'X', ' ' };
 
-	for (int i = 0; i < sizeof(validChars) / sizeof(char); i++)
-		if (c == validChars[i])
+	for (int i = 0; i < sizeof(validSymbols) / sizeof(char); i++)
+		if (c == validSymbols[i])
 			return true;
 
 	return false;
@@ -80,6 +99,7 @@ bool Level::isValidChar(char c)
 
 bool Level::setBoardDimensions(std::ifstream& file)
 {
+	m_boardWidth = m_boardHeight = 0;
 	string input;
 	getline(file, input);
 
@@ -115,7 +135,7 @@ bool Level::setBoardDimensions(std::ifstream& file)
 	return false;
 }
 
-bool Level::setBoardData(std::ifstream& file)
+bool Level::setBoardData(std::ifstream& file, bool isLastLevel)
 {
 	/*
 		Valid characters
@@ -144,7 +164,7 @@ bool Level::setBoardData(std::ifstream& file)
 		if (c == '\n')
 			continue;
 
-		if (!isValidChar(c) || charsInFile > m_boardWidth * m_boardHeight)
+		if (!isValidSymbol(c) || charsInFile > m_boardWidth * m_boardHeight)
 			return false;
 
 		int y = charsInFile / m_boardWidth;
@@ -155,6 +175,9 @@ bool Level::setBoardData(std::ifstream& file)
 		{
 			if (!foundLadder)
 			{
+				if (isLastLevel)
+					m_board[x][y] = 'X';
+
 				m_ladder.set(x, y);
 				foundLadder = true;
 			}
@@ -185,6 +208,7 @@ bool Level::setBoardData(std::ifstream& file)
 		{
 			if (!foundSwanSpawn)
 			{
+				m_board[x][y] = ' ';
 				m_swanSpawn.set(x, y);
 				foundSwanSpawn = true;
 			}
@@ -220,4 +244,19 @@ bool Level::setBoardData(std::ifstream& file)
 	}
 
 	return true;
+}
+
+Point Level::getLadderPos()
+{
+	return m_ladder;
+}
+
+Point Level::getPlayerSpawnPos()
+{
+	return m_playerSpawn;
+}
+
+Point Level::getSwanSpawnPos()
+{
+	return m_swanSpawn;
 }
