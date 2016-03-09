@@ -12,7 +12,12 @@ public:
 	Level();
 	~Level();
 	bool create(std::string filename, bool isLastLevel);
+	bool isWall(int x, int y);
+	bool isApple(int x, int y);
+	void setSpot(int x, int y, char c);
 	void print(Actor** actors, int actorsLength);
+	int getBoardWidth();
+	int getBoardHeight();
 	Point getLadderPos();
 	Point getPlayerSpawnPos();
 	Point getSwanSpawnPos();

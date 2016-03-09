@@ -42,18 +42,17 @@ void Game::play(int numberOfLevels)
 
 		m_levels[levelIndex].print(m_actors, m_actorsLength);
 		
-		int x;
-		cin >> x;
+		// TODO: Finish this
+		break;
 	}
 }
 
 bool Game::createLevels(int numberOfLevels)
 {
-	m_levelsLength = numberOfLevels;
-
 	if (m_levels != 0)
 		delete[] m_levels;
 
+	m_levelsLength = numberOfLevels;
 	m_levels = new Level[m_levelsLength];
 
 	for (int i = 0; i < m_levelsLength; i++)

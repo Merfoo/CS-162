@@ -48,6 +48,30 @@ bool Level::create(std::string filename, bool isLastLevel)
 	return true;
 }
 
+bool Level::isWall(int x, int y)
+{
+	if (x >= 0 && x < m_boardWidth && y >= 0 && y < m_boardHeight)
+		return m_board[x][y] == '#';
+
+	// TODO: Perhaps do something else if out of bounds
+	return true;
+}
+
+bool Level::isApple(int x, int y)
+{
+	if (x >= 0 && x < m_boardWidth && y >= 0 && y < m_boardHeight)
+		return m_board[x][y] == 'A';
+
+	// TODO: Perhaps do something else if out of bounds
+	return false;
+}
+
+void Level::setSpot(int x, int y, char c)
+{
+	if (x >= 0 && x < m_boardWidth && y >= 0 && y < m_boardHeight)
+		m_board[x][y] = c;
+}
+
 void Level::print(Actor** actors, int actorLength)
 {
 	for (int y = 0; y < m_boardHeight; y++)
@@ -244,6 +268,16 @@ bool Level::setBoardData(std::ifstream& file, bool isLastLevel)
 	}
 
 	return true;
+}
+
+int Level::getBoardWidth()
+{
+	return m_boardWidth;
+}
+
+int Level::getBoardHeight()
+{
+	return m_boardHeight;
 }
 
 Point Level::getLadderPos()

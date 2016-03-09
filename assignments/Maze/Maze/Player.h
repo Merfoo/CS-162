@@ -10,5 +10,10 @@ public:
 	virtual void update(Level& level);
 
 private:
+	bool move(Level& level, char command);
+	bool eatApple();
+	char getInput();
 
+	int m_apples;
+	int m_keys;
 };
