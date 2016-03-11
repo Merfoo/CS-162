@@ -9,6 +9,7 @@ public:
 	virtual ~Actor();
 	virtual void update(Level& level) = 0;
 	void setPos(Point pos);
+	void setPos(int x, int y);
 	int getX();
 	int getY();
 	char getSymbol();

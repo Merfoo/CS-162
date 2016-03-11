@@ -7,6 +7,7 @@ using namespace std;
 Player::Player()
 {
 	m_symbol = 'P';
+	m_stepsSinceEatenApple = 0;
 	m_apples = 0;
 	m_keys = 0;
 }
@@ -17,80 +18,123 @@ Player::~Player()
 
 void Player::update(Level& level)
 {
-	char command = getInput();
-
-	if (command == 'w' || command == 'a' || command == 's' || command == 'd')
+	while (true)
 	{
-		if (!move(level, command))
-			cout << "Can't move there!" << endl;
+		char command = getInput();
 
-		if (level.isApple(m_x, m_y))
+		if (command == 'w' || command == 'a' || command == 's' || command == 'd')
 		{
-			m_apples++;
-			level.setSpot(m_x, m_y, ' ');
+			if (move(level, command))
+			{
+				if (level.isDoor(m_x, m_y))
+				{
+					m_keys--;
+					level.setSpot(m_x, m_y, ' ');
+				}
+
+				else if (level.isKey(m_x, m_y) && m_keys < m_maxKeys)
+				{
+					m_keys++;
+					level.setSpot(m_x, m_y, ' ');
+				}
+
+				else if (level.isApple(m_x, m_y) && m_apples < m_maxApples)
+				{
+					m_apples++;
+					level.setSpot(m_x, m_y, ' ');
+				}
+			}
+
+			else
+			{
+				cout << "Can't move there!" << endl;
+				continue;
+			}
 		}
 
-		// TODO: Maybe print out if you're on a key or something
+		else if (command == 'e')
+		{
+			if (!eatApple())
+			{
+				cout << "You don't have any apples to eat!" << endl;
+				continue;
+			}
+		}
+
+		else if (command == 'u')
+		{
+			if (level.isExit(m_x, m_y))
+				level.setShouldLoadNext(true);
+		}
+
+		else if (command == 'q')
+			level.setQuitLevel(true);
+
+		break;
 	}
 
-	else if (command == 'e')
-	{
-		// TODO: Finish this
-		if (!eatApple())
-			cout << "You don't have any apples to eat!" << endl;
-	}
+	m_stepsSinceEatenApple++;
+}
+
+bool Player::immuneToSwans()
+{
+	return m_stepsSinceEatenApple <= m_stepsImmuneToSwans;
+}
+
+int Player::getApples()
+{
+	return m_apples;
+}
+
+int Player::getKeys()
+{
+	return m_keys;
 }
 
 bool Player::move(Level& level, char command)
 {
-	bool moved = false;
+	int x = m_x;
+	int y = m_y;
 
-	// Move up
-	if (command == 'w' && m_y > 0)
-	{
-		if (!level.isWall(m_x, m_y - 1))
-		{
-			m_y--;
-			moved = true;
-		}
-	}
+	if (command == 'w')
+		y--;
 
-	// Move down
-	if (command == 's' && m_y < level.getBoardHeight() - 1)
-	{
-		if (!level.isWall(m_x, m_y + 1))
-		{
-			m_y++;
-			moved = true;
-		}
-	}
+	else if (command == 's')
+		y++;
 
-	// Move left
-	if (command == 'a' && m_x > 0)
-	{
-		if (!level.isWall(m_x - 1, m_y))
-		{
-			m_x--;
-			moved = true;
-		}
-	}
+	else if (command == 'a')
+		x--;
 
-	// Move right
-	if (command == 'd' && m_x < level.getBoardWidth() - 1)
-	{
-		if (!level.isWall(m_x + 1, m_y))
-		{
-			m_x++;
-			moved = true;
-		}
-	}
+	else if (command == 'd')
+		x++;
 
-	return moved;
+	if(x < 0 || x >= level.getBoardWidth())
+		return false;
+	
+	if (y < 0 || y >= level.getBoardHeight())
+		return false;
+
+	if (level.isWall(x, y))
+		return false;
+	
+	if (level.isDoor(x, y) && m_keys <= 0)
+		return false;
+
+	m_x = x;
+	m_y = y;
+	return true;
 }
 
 // TODO: Finish this
 bool Player::eatApple()
 {
+	if (m_apples > 0)
+	{
+		m_apples--;
+		m_stepsSinceEatenApple = 0;
+		return true;
+	}
+
 	return false;
 }
 

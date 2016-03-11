@@ -6,6 +6,8 @@ using namespace std;
 
 Level::Level()
 {
+	m_levelFinished = false;
+	m_quitLevel = false;
 	m_board = 0;
 }
 
@@ -22,7 +24,7 @@ Level::~Level()
 
 bool Level::create(std::string filename, bool isLastLevel)
 {
-	cout << "Creating level from file '" << filename << "'" << endl;
+	cout << "Creating level from file '" << filename << "'\n\t";
 	ifstream file(filename);
 
 	if (!file.is_open())
@@ -66,10 +68,63 @@ bool Level::isApple(int x, int y)
 	return false;
 }
 
+bool Level::isKey(int x, int y)
+{
+	// Consider turning out of bounds check a function
+	if (x >= 0 && x < m_boardWidth && y >= 0 && y < m_boardHeight)
+		return m_board[x][y] == 'K';
+
+	return false;
+}
+
+bool Level::isDoor(int x, int y)
+{
+	if (x >= 0 && x < m_boardWidth && y >= 0 && y < m_boardHeight)
+		return m_board[x][y] == 'D';
+
+	return false;
+}
+
+bool Level::isExit(int x, int y)
+{
+	if (x >= 0 && x < m_boardWidth && y >= 0 && y < m_boardHeight)
+		return m_board[x][y] == 'X' || m_board[x][y] == 'L';
+
+	return false;
+}
+
+bool Level::isEmpty(int x, int y)
+{
+	if (x >= 0 && x < m_boardWidth && y >= 0 && y < m_boardHeight)
+		return m_board[x][y] == ' ';
+
+	return false;
+}
+
 void Level::setSpot(int x, int y, char c)
 {
 	if (x >= 0 && x < m_boardWidth && y >= 0 && y < m_boardHeight)
 		m_board[x][y] = c;
+}
+
+void Level::setShouldLoadNext(bool shouldLoad)
+{
+	m_levelFinished = shouldLoad;
+}
+
+bool Level::shouldLoadNext()
+{
+	return m_levelFinished;
+}
+
+void Level::setQuitLevel(bool shouldQuit)
+{
+	m_quitLevel = shouldQuit;
+}
+
+bool Level::shouldQuit()
+{
+	return m_quitLevel;
 }
 
 void Level::print(Actor** actors, int actorLength)

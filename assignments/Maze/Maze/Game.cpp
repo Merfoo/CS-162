@@ -1,13 +1,17 @@
 #include "Game.h"
 #include <iostream>
 #include <string>
+#include <stdlib.h>
+#include "Util.h"
 #include "Player.h"
 #include "Swan.h"
 
 using namespace std;
+using namespace Util;
 
 Game::Game()
 {
+	m_gameSteps = 0;
 	m_levelsLength = 0;
 	m_levels = 0;
 }
@@ -32,19 +36,56 @@ void Game::play(int numberOfLevels)
 		return;
 
 	int levelIndex = 0;
+	Level& level = m_levels[levelIndex];
 	createActors();
-	setupActors(m_levels[levelIndex]);
+	setupActors(level);
+	Player* player = (Player*)m_actors[0];
 
 	while (true)
 	{
-		for (int i = 0; i < m_actorsLength; i++)
-			m_actors[i]->update(m_levels[levelIndex]);
+		m_gameSteps++;
+		level.print(m_actors, m_actorsLength);
+		cout << "Apples: " << player->getApples();
+		cout << ", Keys: " << player->getKeys();
+		cout << ", Game Step: " << m_gameSteps << endl;
 
-		m_levels[levelIndex].print(m_actors, m_actorsLength);
-		
-		// TODO: Finish this
-		break;
+		if ((m_gameSteps + 1) % m_swanSpawnSteps == 0)
+			spawnSwan(level);
+
+		for (int i = 0; i < m_actorsLength; i++)
+			m_actors[i]->update(level);
+
+		if (level.shouldLoadNext())
+		{
+			if (++levelIndex < numberOfLevels)
+			{
+				level = m_levels[levelIndex];
+				setupActors(level);
+			}
+
+			else
+			{
+				cout << "You have escaped the maze!" << endl;
+				break;
+			}
+		}
+
+		else if (level.shouldQuit())
+		{
+			cout << "Bye you quitter!" << endl;
+			break;
+		}
+
+		else if (!player->immuneToSwans())
+			for (int i = 1; i < m_actorsLength; i++)
+				if (nextToEachOther(player, m_actors[i]))
+					player->setPos(level.getPlayerSpawnPos());
 	}
+}
+
+bool Game::nextToEachOther(Actor* a, Actor* b)
+{
+	return abs(a->getX() - b->getX()) <= 1 && abs(a->getY() - b->getY()) <= 1;
 }
 
 bool Game::createLevels(int numberOfLevels)
@@ -97,4 +138,26 @@ void Game::setupActors(Level& level)
 	
 	m_actors[0]->setPos(level.getPlayerSpawnPos());
 	m_actors[1]->setPos(level.getSwanSpawnPos());
+}
+
+void Game::spawnSwan(Level& level)
+{
+	Actor** tmp = new Actor*[m_actorsLength + 1];
+
+	for (int i = 0; i < m_actorsLength; i++)
+		tmp[i] = m_actors[i];
+
+	Swan* swan = new Swan;
+
+	while (!level.isEmpty(swan->getX(), swan->getY()))
+	{
+		int x = getRandomInt(0, level.getBoardWidth());
+		int y = getRandomInt(0, level.getBoardHeight());
+		swan->setPos(x, y);
+	}
+	
+	tmp[m_actorsLength] = swan;
+	delete[] m_actors;
+	m_actors = tmp;
+	m_actorsLength++;
 }
