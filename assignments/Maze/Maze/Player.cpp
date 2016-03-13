@@ -65,6 +65,12 @@ void Player::update(Level& level)
 		{
 			if (level.isExit(m_x, m_y))
 				level.setShouldLoadNext(true);
+
+            else
+            {
+                cout << "You're not on a ladder or exit to use!" << endl;
+                continue;
+            }
 		}
 
 		else if (command == 'q')
@@ -125,7 +131,6 @@ bool Player::move(Level& level, char command)
 	return true;
 }
 
-// TODO: Finish this
 bool Player::eatApple()
 {
 	if (m_apples > 0)

@@ -16,7 +16,7 @@ private:
 	void setupActors(Level& level);
 	void spawnSwan(Level& level);
 
-	const int m_swanSpawnSteps = 30;
+	static const int m_swanSpawnSteps = 30;
 	int m_gameSteps;
 	int m_levelsLength;
 	Level* m_levels;

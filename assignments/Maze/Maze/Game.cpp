@@ -14,6 +14,7 @@ Game::Game()
 	m_gameSteps = 0;
 	m_levelsLength = 0;
 	m_levels = 0;
+	m_actors = 0;
 }
 
 Game::~Game()
@@ -36,31 +37,31 @@ void Game::play(int numberOfLevels)
 		return;
 
 	int levelIndex = 0;
-	Level& level = m_levels[levelIndex];
 	createActors();
-	setupActors(level);
+	setupActors(m_levels[levelIndex]);
 	Player* player = (Player*)m_actors[0];
 
 	while (true)
 	{
 		m_gameSteps++;
-		level.print(m_actors, m_actorsLength);
+		m_levels[levelIndex].print(m_actors, m_actorsLength);
 		cout << "Apples: " << player->getApples();
 		cout << ", Keys: " << player->getKeys();
 		cout << ", Game Step: " << m_gameSteps << endl;
 
 		if ((m_gameSteps + 1) % m_swanSpawnSteps == 0)
-			spawnSwan(level);
+			spawnSwan(m_levels[levelIndex]);
 
 		for (int i = 0; i < m_actorsLength; i++)
-			m_actors[i]->update(level);
+			m_actors[i]->update(m_levels[levelIndex]);
 
-		if (level.shouldLoadNext())
+		if (m_levels[levelIndex].shouldLoadNext())
 		{
 			if (++levelIndex < numberOfLevels)
 			{
-				level = m_levels[levelIndex];
-				setupActors(level);
+				m_levels[levelIndex] = m_levels[levelIndex];
+				setupActors(m_levels[levelIndex]);
+                m_gameSteps = 0;
 			}
 
 			else
@@ -70,7 +71,7 @@ void Game::play(int numberOfLevels)
 			}
 		}
 
-		else if (level.shouldQuit())
+		else if (m_levels[levelIndex].shouldQuit())
 		{
 			cout << "Bye you quitter!" << endl;
 			break;
@@ -79,7 +80,7 @@ void Game::play(int numberOfLevels)
 		else if (!player->immuneToSwans())
 			for (int i = 1; i < m_actorsLength; i++)
 				if (nextToEachOther(player, m_actors[i]))
-					player->setPos(level.getPlayerSpawnPos());
+					player->setPos(m_levels[levelIndex].getPlayerSpawnPos());
 	}
 }
 
@@ -98,7 +99,7 @@ bool Game::createLevels(int numberOfLevels)
 
 	for (int i = 0; i < m_levelsLength; i++)
 	{
-		string filename = "floor_" + to_string(i + 1) + ".txt";
+		string filename = "floor_" + to_string((long long)(i + 1)) + ".txt";
 
 		if (!m_levels[i].create(filename, i == m_levelsLength - 1))
 			return false;

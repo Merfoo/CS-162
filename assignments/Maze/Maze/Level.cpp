@@ -239,9 +239,9 @@ bool Level::setBoardData(std::ifstream& file, bool isLastLevel)
 	{
 		char c;
 		file >> noskipws >> c;
-
-		if (c == '\n')
-			continue;
+		
+        if (c == '\n')
+	        continue;
 
 		if (!isValidSymbol(c) || charsInFile > m_boardWidth * m_boardHeight)
 			return false;

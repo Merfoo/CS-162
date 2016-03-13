@@ -17,9 +17,9 @@ private:
 	bool eatApple();
 	char getInput();
 
-	const int m_maxKeys = 3;
-	const int m_maxApples = 2;
-	const int m_stepsImmuneToSwans = 15;
+	static const int m_maxKeys = 3;
+	static const int m_maxApples = 2;
+	static const int m_stepsImmuneToSwans = 15;
 	int m_stepsSinceEatenApple;
 	int m_apples;
 	int m_keys;

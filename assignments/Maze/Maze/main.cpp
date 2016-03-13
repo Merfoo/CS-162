@@ -50,5 +50,5 @@ int main(int argc, char* argv[])
 	game.play(numberOfFloors);
 
 	cout << "Press enter to quit..." << endl;
-	return cin.get();
+    return cin.get();
 }
