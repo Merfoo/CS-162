@@ -59,9 +59,8 @@ void Game::play(int numberOfLevels)
 		{
 			if (++levelIndex < numberOfLevels)
 			{
-				m_levels[levelIndex] = m_levels[levelIndex];
 				setupActors(m_levels[levelIndex]);
-                m_gameSteps = 0;
+				m_gameSteps = 0;
 			}
 
 			else
